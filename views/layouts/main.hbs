@@ -1,0 +1,28 @@
+<html lang="en">
+  <head>
+    <title>UOG Course Calendar</title>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="stylesheet" href="/files/dist.css" />
+  </head>
+  <body class="flex bg-slate-700 h-[100vh]">
+    <aside class="bg-slate-800 min-h-full w-[16em] py-4 px-6">
+      <ol>
+        <li><a class="link" href="/">Home</a></li>
+        <br />
+        {{#if isLoggedIn}}
+        <li><a class="link" href="/me/import">Import</a></li>
+        <li><a class="link" href="/me/account">Account</a></li>
+        <br />
+        <p>Hey there, {{user}}</p>
+        <a href="/calendar/{{id}}" class="link">Your Calendar</a>
+        <li><a class="link" href="/auth/logout">Log Out</a></li>
+        {{/if}} {{#unless isLoggedIn}}
+        <li><a class="link" href="/login">Login</a></li>
+        <li><a class="link" href="/register">Register</a></li>
+        {{/unless}}
+      </ol>
+    </aside>
+    <main class="flex-1 px-16 py-10 overflow-y-auto">{{embed}}</main>
+  </body>
+</html>

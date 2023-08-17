@@ -1,0 +1,8 @@
+# You're not a robot?
+
+User-Agent: *
+Disallow: /files
+Disallow: /calendar
+Disallow: /upload
+Disallow: /me
+Disallow: /auth

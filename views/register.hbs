@@ -1,0 +1,23 @@
+<h1>Register</h1>
+
+<form action="/auth/register" method="post" enctype="multipart/form-data" class="[&>*]:my-2">
+  <div>
+    <label for="username">Username</label>
+    <br>
+    <input type="text" minlength="3" maxlength="16" class="text-black bg-white" name="Username" id="username" />
+    <sub>2-16 characters</sub>
+  </div>
+  <div>
+    <label for="password">Password</label>
+    <br>
+    <input type="password" minlength="8" maxlength="64" class="text-black bg-white" name="Password" id="password" />
+    <sub>8-64 characters</sub>
+  </div>
+  <input
+    class="px-2 py-1 mt-4 text-black bg-white rounded-md"
+    type="submit"
+    value="Sign Up"
+  />
+</form>
+
+<a href="/login" class="link">Already have an account? Login</a>

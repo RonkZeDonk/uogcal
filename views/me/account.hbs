@@ -1,0 +1,77 @@
+{{#calendarContext as |calendars|}}
+<h1>Account</h1>
+
+<div class="my-2">
+  <h2>Installing your calendar</h2>
+  <p>Copy the "Your Calendar" link on the left side and follow these steps</p>
+  <ul class="ml-4 list-disc list-inside">
+    <li>
+      Using Google Calendar
+      <ul class="ml-4 list-disc list-inside">
+        <li>
+          Follow the steps under the 'Use a link to add a public calendar'
+          section of
+          <a
+            href="https://support.google.com/calendar/answer/37100"
+            class="link"
+            target="_blank"
+            rel="noopener noreferrer"
+            >this page.</a
+          >
+        </li>
+      </ul>
+    </li>
+    <li>
+      <a
+        href="http://www.medportal.ca/public/help/google/calendar/import-a-calendar-by-url-on-iphone-ipad-ipod"
+        target="_blank"
+        class="link"
+        rel="noopener noreferrer"
+        >Using the Apple calendar app</a
+      >
+    </li>
+    <li>
+      Use a calendar not listed here? Google "how to add a calendar by url"
+      followed by your calendar app's name
+    </li>
+  </ul>
+</div>
+
+<h2 class="mb-2">Your Sections</h2>
+{{#if calendars}}
+<table>
+  <thead>
+    <tr>
+      <th>Code</th>
+      <th>Type</th>
+      <th>Name</th>
+      <th>Days</th>
+      <th>Start time</th>
+      <th>End time</th>
+      <th>Location</th>
+      <th>First day</th>
+      <th>Last day</th>
+    </tr>
+  </thead>
+  <tbody>
+    {{#each calendars as |calendar|}}
+    <tr>
+      <td>{{calendar.code}}</td>
+      <td>{{calendar.courseType}}</td>
+      <td>{{calendar.name}}</td>
+      <td>{{calendar.days}}</td>
+      <td>{{calendar.startTime}}</td>
+      <td>{{calendar.endTime}}</td>
+      <td>{{calendar.location}}</td>
+      <td>{{calendar.startDate}}</td>
+      <td>{{calendar.endDate}}</td>
+    </tr>
+    {{/each}}
+  </tbody>
+</table>
+{{else}}
+<p>
+  You have no sections...
+  <a class="link" href="/me/import">Try importing your courses</a>
+</p>
+{{/if}} {{/calendarContext}}

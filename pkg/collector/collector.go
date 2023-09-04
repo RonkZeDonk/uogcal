@@ -239,3 +239,30 @@ func GetSectionData(term string, sectionCode string, verifyHeader string, verify
 
 	return section, meetings, nil
 }
+
+func AddNewSections(date time.Time, term string) error {
+	matchedSections, err := database.GetSectionsBeforeDate(date, term)
+	if err != nil {
+		return err
+	}
+
+	verify, err := GetVerificationTokenAndCookie()
+	if err != nil {
+		return err
+	}
+
+	for code := range matchedSections {
+		course, meetings, err := GetSectionData(strings.ToUpper(term), code, verify.Header, verify.Cookie)
+		if err != nil {
+			return err
+		}
+		err = database.AddNewSections(course, meetings)
+		if err != nil {
+			return err
+		}
+	}
+
+	fmt.Printf("checked %v courses\n", len(matchedSections))
+
+	return nil
+}

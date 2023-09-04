@@ -121,6 +121,44 @@ func AddSection(section CourseSection, meetings []SectionMeeting) error {
 	return nil
 }
 
+func AddNewSections(section CourseSection, meetings []SectionMeeting) error {
+	pool := getInstance()
+
+	// Insert sections
+	for _, meeting := range meetings {
+		_, err := pool.Exec(
+			context.Background(),
+			`INSERT INTO section_meeting VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11) ON CONFLICT DO NOTHING`,
+			meeting.Code,
+			meeting.Type,
+			fmt.Sprintf(
+				"%v %v.%v",
+				meeting.Created.Format(time.DateOnly),
+				meeting.Created.Format(time.TimeOnly),
+				meeting.Created.Nanosecond()%1e6,
+			),
+			meeting.StartDate.Format(time.DateOnly),
+			meeting.EndDate.Format(time.DateOnly),
+			meeting.StartTime.Format(time.TimeOnly),
+			meeting.EndTime.Format(time.TimeOnly),
+			meeting.MeetingDays,
+			meeting.Location,
+			fmt.Sprintf(
+				"%v %v.%v",
+				meeting.LastModified.Format(time.DateOnly),
+				meeting.LastModified.Format(time.TimeOnly),
+				meeting.LastModified.Nanosecond()%1e6,
+			),
+			meeting.UpdateCount,
+		)
+		if err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
 // Add a user to course
 func AddUserToSection(userId string, code string) error {
 	pool := getInstance()
@@ -226,4 +264,35 @@ func GetSectionsByUUID(uuid string) ([]CourseSectionJoin, error) {
 		})
 	}
 	return res, nil
+}
+
+func GetSectionsBeforeDate(date time.Time, term string) (map[string]bool, error) {
+	pool := getInstance()
+
+	rows, err := pool.Query(
+		context.Background(),
+		"SELECT code FROM section_meeting sm WHERE sm.created <= $1;",
+		date,
+	)
+	if err != nil {
+		return nil, err
+	}
+
+	alreadyChecked := map[string]bool{}
+
+	for rows.Next() {
+		var code string
+
+		err := rows.Scan(&code)
+		if err != nil {
+			return nil, err
+		}
+		if alreadyChecked[code] {
+			continue
+		}
+
+		alreadyChecked[code] = true
+	}
+
+	return alreadyChecked, nil
 }

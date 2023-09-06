@@ -4,8 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "buildStyles": "postcss styles/*.css -o public/dist.css --verbose",
-    "watchStyles": "postcss styles/*.css -o public/dist.css --verbose -w"
+    "buildStyles": "postcss styles/**/*.css -o public/dist.css --verbose",
+    "watchStyles": "postcss styles/**/*.css -o public/dist.css --verbose -w"
   },
   "keywords": [],
   "author": "",

@@ -17,75 +17,78 @@
   });
 </script>
 
-<h1>Import your courses</h1>
+<div class="py-10">
+  <h1>Import your courses</h1>
 
-<p>
-  Entering your courses into a calendar manually is a thing of the past. Now you
-  can use a
-  <a
-    href="https://en.wikipedia.org/wiki/Bookmarklet"
-    class="link"
-    target="_blank"
-    >bookmarklet</a
-  >
-  to quickly export your courses into a json file. We'll take that json file and
-  import it on to your account and automatically manage your course schedule.
-</p>
-
-<div class="px-6 py-4 my-4 rounded-md bg-slate-800">
-  <h2>Note:</h2>
   <p>
-    The bookmarklet provided doesn't access your account credentials, storage,
-    or the internet. It simply scrapes the page for your course info.
-  </p>
-  <p>
-    If your schedule changes at any time (for example you drop/add a course) you
-    need to update your courses manually by rerunning the bookmarklet and
-    reuploading the json data.
-  </p>
-</div>
-
-<p class="mb-2">Drag this bookmarklet to your bookmarks bar.</p>
-<a
-  id="bookmarklet"
-  href="#"
-  class="inline-block px-4 py-2 text-gray-100 border rounded-lg border-amber-700"
-  >Course Exporter</a
->
-<a href="/files/getCourses.js" class="ml-2 link" target="_blank"
-  >View bookmarklet source</a
->
-
-<p class="mt-4">
-  Once you have the bookmarklet installed you can use it to generate your json
-  data in an easy 3 step process.
-</p>
-<ol class="ml-6 list-decimal list-inside">
-  <li>
-    Go to the
+    Entering your courses into a calendar manually is a thing of the past. Now
+    you can use a
     <a
-      href="https://colleague-ss.uoguelph.ca/Student/Planning/DegreePlans"
+      href="https://en.wikipedia.org/wiki/Bookmarklet"
       class="link"
       target="_blank"
-      >plan and schedule page</a
+      >bookmarklet</a
     >
-    on WebAdvisor and navigate to your target semester.
-  </li>
-  <li>Launch the bookmarklet and save the file it generates.</li>
-  <li>Import the file below</li>
-</ol>
+    to quickly export your courses into a json file. We'll take that json file
+    and import it on to your account and automatically manage your course
+    schedule.
+  </p>
 
-<div class="px-6 py-4 my-4 rounded-md bg-slate-800">
-  <h2 class="mb-2">Import courses</h2>
-  <form action="/upload/courses" method="post" enctype="multipart/form-data">
-    <label for="courses">Upload <code>courses.json</code></label>
-    <input type="file" name="courses" id="course" accept="application/json" />
-    <br />
-    <button
-      type="submit"
-      class="px-4 py-2 mt-2 text-gray-800 rounded-md bg-amber-600"
-    >
-      Add to Account
-    </button>
-  </form>
+  <div class="px-6 py-4 my-4 rounded-md bg-zinc-800">
+    <h2>Note:</h2>
+    <p>
+      The bookmarklet provided doesn't access your account credentials, storage,
+      or the internet. It simply scrapes the page for your course info.
+    </p>
+    <p>
+      If your schedule changes at any time (for example you drop/add a course)
+      you need to update your courses manually by rerunning the bookmarklet and
+      reuploading the json data.
+    </p>
+  </div>
+
+  <p class="mb-2">Drag this bookmarklet to your bookmarks bar.</p>
+  <a
+    id="bookmarklet"
+    href="#"
+    class="inline-block px-4 py-2 text-gray-200 border rounded-lg border-secondary"
+    >Course Exporter</a
+  >
+  <a href="/files/getCourses.js" class="ml-2 link" target="_blank"
+    >View bookmarklet source</a
+  >
+
+  <p class="mt-4">
+    Once you have the bookmarklet installed you can use it to generate your json
+    data in an easy 3 step process.
+  </p>
+  <ol class="ml-6 list-decimal list-inside">
+    <li>
+      Go to the
+      <a
+        href="https://colleague-ss.uoguelph.ca/Student/Planning/DegreePlans"
+        class="link"
+        target="_blank"
+        >plan and schedule page</a
+      >
+      on WebAdvisor and navigate to your target semester.
+    </li>
+    <li>Launch the bookmarklet and save the file it generates.</li>
+    <li>Import the file below</li>
+  </ol>
+
+  <div class="px-6 py-4 my-4 rounded-md bg-zinc-800">
+    <h2 class="mb-2">Import courses</h2>
+    <form action="/upload/courses" method="post" enctype="multipart/form-data">
+      <label for="courses">Upload <code>courses.json</code></label>
+      <input type="file" name="courses" id="course" accept="application/json" />
+      <br />
+      <button
+        type="submit"
+        class="px-4 py-2 mt-2 text-gray-300 rounded-md bg-secondary"
+      >
+        Add to Account
+      </button>
+    </form>
+  </div>
 </div>

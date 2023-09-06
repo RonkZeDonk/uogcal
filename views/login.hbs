@@ -1,23 +1,46 @@
-<h1>Login</h1>
+<div class="flex items-center justify-center py-10">
+  <div class="px-8 py-8 rounded-md bg-zinc-800">
+    <h1>Login</h1>
 
-<form action="/auth/login" method="post" enctype="multipart/form-data" class="[&>*]:my-2">
-  <div>
-    <label for="username">Username</label>
-    <br>
-    <input type="text" minlength="3" maxlength="16" class="text-black bg-white" name="Username" id="username" />
-    <sub>2-16 characters</sub>
-  </div>
-  <div>
-    <label for="password">Password</label>
-    <br>
-    <input type="password" minlength="8" maxlength="64" class="text-black bg-white" name="Password" id="password" />
-    <sub>8-64 characters</sub>
-  </div>
-  <input
-    class="px-2 py-1 mt-4 text-black bg-white rounded-md"
-    type="submit"
-    value="Login"
-  />
-</form>
+    <form
+      action="/auth/login"
+      method="post"
+      enctype="multipart/form-data"
+      class="[&>*]:my-2"
+    >
+      <div>
+        <label for="username">Username</label>
+        <br />
+        <input
+          type="text"
+          minlength="3"
+          maxlength="16"
+          class="text-black bg-white"
+          name="Username"
+          id="username"
+        />
+        <sub>2-16 characters</sub>
+      </div>
+      <div>
+        <label for="password">Password</label>
+        <br />
+        <input
+          type="password"
+          minlength="8"
+          maxlength="64"
+          class="text-black bg-white"
+          name="Password"
+          id="password"
+        />
+        <sub>8-64 characters</sub>
+      </div>
+      <input
+        class="px-2 py-1 mt-4 text-black bg-white rounded-md"
+        type="submit"
+        value="Login"
+      />
+    </form>
 
-<a href="/register" class="link">Don't have an account? Register</a>
+    <a href="/register" class="link">Don't have an account? Register</a>
+  </div>
+</div>

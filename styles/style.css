@@ -3,58 +3,60 @@
 @tailwind utilities;
 
 body {
-	/* Tailwind Gray 300 */
-	color: #d1d5db;
+  /* Tailwind Gray 300 */
+  color: #d1d5db;
 }
 
 code {
-	/* Slate 900 */
-	background-color: #0f172a;
-	padding: 2px 4px;
-	border-radius: 4px;
+  /* Zinc 900 */
+  background-color: #18181b;
+  padding: 2px 4px;
+  border-radius: 4px;
 }
 
 th {
-	/* Slate 900 */
-	background-color: #0f172a;
-}
-
-tr:nth-child(2n + 1) {
-	background-color: #1e293b;
+  /* Slate 900 */
+  background-color: #0f172a;
 }
 
 tr:nth-child(2n) {
-	background-color: #243147;
+  /* Zinc 800 */
+  background-color: #1f2937;
+}
+
+tr:nth-child(2n + 1) {
+  /* Zinc 700 */
+  background-color: #2a303d;
 }
 
 tr,
 td,
 th {
-	padding: 0.6rem;
+  padding: 0.6rem;
 }
 
 h1 {
-	/* text-4xl */
-	font-size: 1.875rem;
-	line-height: 2.25rem;
+  /* text-4xl */
+  font-size: 1.875rem;
+  line-height: 2.25rem;
 
-	/* mb-6 */
-	margin-bottom: 1rem;
+  /* mb-6 */
+  margin-bottom: 1rem;
 }
 
 h2 {
-	/* text-lg */
-	font-size: 1.125rem;
-	line-height: 1.75rem;
+  /* text-lg */
+  font-size: 1.125rem;
+  line-height: 1.75rem;
 
-	/* font-bold */
-	font-weight: 700;
+  /* font-bold */
+  font-weight: 700;
 }
 
 .link {
-	/* underline */
-	text-decoration-line: underline;
+  /* underline */
+  text-decoration-line: underline;
 
-	/* text-gray-200 */
-	color: rgb(229 231 235);
+  /* text-gray-200 */
+  color: rgb(229 231 235);
 }

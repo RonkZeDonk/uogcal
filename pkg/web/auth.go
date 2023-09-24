@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/RonkZeDonk/uogcal/pkg/database"
+	"github.com/RonkZeDonk/uogcal/pkg/redis"
 	jwtware "github.com/gofiber/contrib/jwt"
 	"github.com/gofiber/fiber/v2"
 	"github.com/golang-jwt/jwt/v5"
@@ -29,21 +30,42 @@ type ClaimsMap struct {
 
 const JWT_COOKIE_KEY = "uogcal_token"
 
-func GetAuthClaims(c *fiber.Ctx) (ClaimsMap, error) {
+func getClaims(c *fiber.Ctx) (jwt.MapClaims, error) {
 	token := c.Cookies(JWT_COOKIE_KEY)
 	parsed, err := jwt.Parse(token, func(t *jwt.Token) (interface{}, error) {
 		return []byte(os.Getenv("JWT_SECRET")), nil
 	})
 	if err != nil {
+		return jwt.MapClaims{}, err
+	}
+	return parsed.Claims.(jwt.MapClaims), nil
+}
+
+func GetAuthClaims(c *fiber.Ctx) (ClaimsMap, error) {
+	claims, err := getClaims(c)
+	if err != nil {
 		return ClaimsMap{}, err
 	}
-	claims := parsed.Claims.(jwt.MapClaims)
 
 	res := ClaimsMap{
 		User: claims["user"].(string),
 		Id:   claims["id"].(string),
 	}
 	return res, nil
+}
+
+func GetJWTExpiration(c *fiber.Ctx) (time.Duration, error) {
+	claims, err := getClaims(c)
+	if err != nil {
+		return 0, err
+	}
+
+	exp, err := claims.GetExpirationTime()
+	if err != nil {
+		return 0, err
+	}
+
+	return time.Until(exp.Time), nil
 }
 
 func createJWTCookie(claims ClaimsMap) (*fiber.Cookie, error) {
@@ -72,6 +94,20 @@ func createJWTCookie(claims ClaimsMap) (*fiber.Cookie, error) {
 	return &cookie, nil
 }
 
+func removeJWTCookie(c *fiber.Ctx) {
+	cookie := fiber.Cookie{
+		Name:    JWT_COOKIE_KEY,
+		Expires: time.UnixMilli(0),
+		Path:    "/",
+	}
+	c.Cookie(&cookie)
+}
+
+func deauthJWT(c *fiber.Ctx, expiry time.Duration) error {
+	token := c.Cookies(JWT_COOKIE_KEY)
+	return redis.Set(token, 1, expiry)
+}
+
 func AuthRoutes(r fiber.Router) {
 	r.Use([]string{"/auth", "/me", "/upload"}, jwtware.New(jwtware.Config{
 		TokenLookup: "cookie:" + JWT_COOKIE_KEY,
@@ -92,6 +128,15 @@ func AuthRoutes(r fiber.Router) {
 		ErrorHandler: func(c *fiber.Ctx, err error) error {
 			c.Set(fiber.HeaderCacheControl, "no-store, must-revalidate")
 			return c.Redirect("/login")
+		},
+		SuccessHandler: func(c *fiber.Ctx) error {
+			if redis.Exists(c.Cookies(JWT_COOKIE_KEY)) {
+				removeJWTCookie(c)
+
+				c.Set(fiber.HeaderCacheControl, "no-store, must-revalidate")
+				return c.Redirect("/login")
+			}
+			return c.Next()
 		},
 		SigningKey: jwtware.SigningKey{
 			Key: []byte(os.Getenv("JWT_SECRET")),
@@ -126,12 +171,13 @@ func AuthRoutes(r fiber.Router) {
 	})
 
 	r.Get("/auth/logout", func(c *fiber.Ctx) error {
-		cookie := fiber.Cookie{
-			Name:    JWT_COOKIE_KEY,
-			Expires: time.UnixMilli(0),
-			Path:    "/",
+		timeUntilExpire, err := GetJWTExpiration(c)
+		if err != nil {
+			return c.SendString(err.Error())
 		}
-		c.Cookie(&cookie)
+
+		deauthJWT(c, timeUntilExpire)
+		removeJWTCookie(c)
 
 		c.Set(fiber.HeaderCacheControl, "no-store, must-revalidate")
 		return c.Redirect("/")

@@ -6,23 +6,28 @@ ENTRYPOINT=cmd/main.go
 OUTPUT=main-${GOOS}-${GOARCH}
 PACKAGE=uogcal.tar.gz
 
-.PHONY: build styles package fmt clean
+.PHONY: build backend frontend package fmt clean
 
-build: styles
+build: backend frontend
+
+${OUTPUT}: backend
+dist: frontend
+
+backend:
 ifeq ($(GOARM),)
 	GOOS=${GOOS} GOARCH=${GOARCH} go build -o ${OUTPUT} ${ENTRYPOINT}
 else
 	GOOS=${GOOS} GOARCH=${GOARCH} GOARM=${GOARM} go build -o ${OUTPUT} ${ENTRYPOINT}
 endif
 
-styles:
-	NODE_ENV=production pnpm buildStyles
+frontend:
+	NODE_ENV=production pnpm build
 
-package: ${OUTPUT}
-	tar -czvf ${PACKAGE} ${OUTPUT} views public robots.txt
+package: ${OUTPUT} dist
+	tar -czvf ${PACKAGE} ${OUTPUT} dist
 
 fmt:
 	go fmt -x ./...
 
 clean:
-	rm -f ${OUTPUT} ${PACKAGE}
+	rm -rf ${OUTPUT} ${PACKAGE} dist

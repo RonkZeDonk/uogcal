@@ -1,47 +1,71 @@
-<div
-  class="grid min-h-[calc(100vh-4.5rem)] gap-20 py-10 lg:py-12 md:grid-cols-2"
->
-  <div class="flex flex-col justify-center gap-2 max-md:items-center">
-    <div>
-      <h1 class="lg:text-4xl md:max-w-[12em] max-md:text-center">
-        Save time without sacrificing your experience
-      </h1>
-      <p class="max-w-[38em] max-md:text-center">
-        Import all your courses in a couple clicks. Never forget about an
-        assignment with our classroom-wide assignment date sharing.
-      </p>
-    </div>
-    <div class="mt-3">
-      <a
-        href="/register"
-        class="px-5 py-3 mr-2 transition-colors bg-secondary rounded-xl hover:bg-violet-500 focus-within:bg-purple-500"
-        >Get Started</a
-      >
-      <a
-        href="#"
-        class="px-5 py-3 transition-colors outline outline-1 outline-secondary rounded-xl hover:bg-secondary focus-within:bg-purple-500"
-        >Learn More</a
-      >
-    </div>
-  </div>
-  <div>
+import gsap from "gsap";
+import { useLayoutEffect, useRef } from "react";
+
+function LandingHero() {
+  const root = useRef<SVGSVGElement>(null);
+  const tl = useRef<GSAPTimeline>();
+
+  useLayoutEffect(() => {
+    gsap.context(() => {
+      tl.current = gsap
+        .timeline({ repeat: 0 })
+        .set("#svgCalendar", { y: 0 })
+        .to("#svgMouse", { x: -350, y: -250, duration: 1 })
+        .to("#svgMouse", { opacity: 0, duration: 0.35, delay: 0.2 })
+        .to("#svgButtonText", { opacity: 0, duration: 0.35 })
+        .to("#svgButtonBackground", { attr: { fill: "#19141a" } }, "<")
+        .to(
+          "#svgButton",
+          {
+            scale: 0,
+            transformOrigin: "50% 50%",
+            duration: 1,
+          },
+          "<"
+        )
+        .to("#svgButton", { opacity: 0, duration: 0.5 }, "<")
+        .to("#svgCalendar", { scale: 1, transformOrigin: "50% 50%" }, "<")
+        .to("#svgCalendar line", { opacity: 1, duration: 0.5 })
+        .to(
+          "#svgCalendar g",
+          {
+            opacity: 1,
+            duration: 0.5,
+            stagger: { grid: [2, 10], from: "start", axis: "x", amount: 1.5 },
+          },
+          "<"
+        );
+    }, root);
+  }, []);
+
+  return (
     <svg
       width="850"
       height="612"
       viewBox="0 0 850 612"
-      class="w-full h-full max-md:max-h-[40vh]"
+      style={{
+        width: "100%",
+        height: "100%",
+      }}
+      className="max-md:max-h-[40vh]"
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
+      ref={root}
     >
-      <g clip-path="url(#clip0_41_728)" id="svgCalendar" style="scale: 00%">
-        <rect width="848" height="608" rx="16" fill="#19141A" />
+      <g clipPath="url(#clip0_41_728)" id="svgCalendar" scale={0}>
+        <rect
+          width="848"
+          height="608"
+          rx="16"
+          className="fill-[var(--mantine-color-gray-4)] dark:fill-[var(--mantine-color-dark-8)]"
+        />
         <line
           x1="175.3"
           y1="-49.9986"
           x2="173.3"
           y2="658.001"
           stroke="black"
-          style="opacity: 0"
+          opacity={0}
         />
         <line
           x1="342.1"
@@ -49,7 +73,7 @@
           x2="340.1"
           y2="658.001"
           stroke="black"
-          style="opacity: 0"
+          opacity={0}
         />
         <line
           x1="508.9"
@@ -57,7 +81,7 @@
           x2="506.9"
           y2="658.001"
           stroke="black"
-          style="opacity: 0"
+          opacity={0}
         />
         <line
           x1="675.7"
@@ -65,267 +89,295 @@
           x2="673.7"
           y2="658.001"
           stroke="black"
-          style="opacity: 0"
+          opacity={0}
         />
-        <g style="opacity: 0">
-          <rect x="18" y="241" width="145" height="168" rx="8" fill="#5C4194" />
+        <g opacity={0}>
+          <rect
+            x="18"
+            y="241"
+            width="145"
+            height="168"
+            rx="8"
+            className="fill-[var(--mantine-primary-color-filled)]"
+          />
           <path
             d="M33 258H140"
-            stroke="#6F4EB1"
-            stroke-width="8"
-            stroke-linecap="round"
+            className="stroke-[var(--mantine-color-myColor-4)] dark:stroke-[var(--mantine-color-myColor-6)]"
+            strokeWidth="8"
+            strokeLinecap="round"
           />
           <path
             d="M33 278H97"
-            stroke="#6F4EB1"
-            stroke-width="8"
-            stroke-linecap="round"
+            className="stroke-[var(--mantine-color-myColor-4)] dark:stroke-[var(--mantine-color-myColor-6)]"
+            strokeWidth="8"
+            strokeLinecap="round"
           />
           <path
             d="M33 298H111"
-            stroke="#6F4EB1"
-            stroke-width="8"
-            stroke-linecap="round"
+            className="stroke-[var(--mantine-color-myColor-4)] dark:stroke-[var(--mantine-color-myColor-6)]"
+            strokeWidth="8"
+            strokeLinecap="round"
           />
         </g>
 
-        <g style="opacity: 0">
+        <g opacity={0}>
           <rect
             x="185"
             y="110"
             width="145"
             height="168"
             rx="8"
-            fill="#5C4194"
+            className="fill-[var(--mantine-primary-color-filled)]"
           />
           <path
             d="M200 127H307"
-            stroke="#6F4EB1"
-            stroke-width="8"
-            stroke-linecap="round"
+            className="stroke-[var(--mantine-color-myColor-4)] dark:stroke-[var(--mantine-color-myColor-6)]"
+            strokeWidth="8"
+            strokeLinecap="round"
           />
           <path
             d="M200 147H264"
-            stroke="#6F4EB1"
-            stroke-width="8"
-            stroke-linecap="round"
+            className="stroke-[var(--mantine-color-myColor-4)] dark:stroke-[var(--mantine-color-myColor-6)]"
+            strokeWidth="8"
+            strokeLinecap="round"
           />
           <path
             d="M200 167H278"
-            stroke="#6F4EB1"
-            stroke-width="8"
-            stroke-linecap="round"
+            className="stroke-[var(--mantine-color-myColor-4)] dark:stroke-[var(--mantine-color-myColor-6)]"
+            strokeWidth="8"
+            strokeLinecap="round"
           />
         </g>
 
-        <g style="opacity: 0">
+        <g opacity={0}>
           <rect
             x="185"
             y="341"
             width="145"
             height="109"
             rx="8"
-            fill="#5C4194"
+            className="fill-[var(--mantine-primary-color-filled)]"
           />
           <path
             d="M200 358H307"
-            stroke="#6F4EB1"
-            stroke-width="8"
-            stroke-linecap="round"
+            className="stroke-[var(--mantine-color-myColor-4)] dark:stroke-[var(--mantine-color-myColor-6)]"
+            strokeWidth="8"
+            strokeLinecap="round"
           />
           <path
             d="M200 378H264"
-            stroke="#6F4EB1"
-            stroke-width="8"
-            stroke-linecap="round"
+            className="stroke-[var(--mantine-color-myColor-4)] dark:stroke-[var(--mantine-color-myColor-6)]"
+            strokeWidth="8"
+            strokeLinecap="round"
           />
           <path
             d="M200 398H278"
-            stroke="#6F4EB1"
-            stroke-width="8"
-            stroke-linecap="round"
+            className="stroke-[var(--mantine-color-myColor-4)] dark:stroke-[var(--mantine-color-myColor-6)]"
+            strokeWidth="8"
+            strokeLinecap="round"
           />
         </g>
 
-        <g style="opacity: 0">
-          <rect x="351" y="419" width="145" height="76" rx="8" fill="#5C4194" />
+        <g opacity={0}>
+          <rect
+            x="351"
+            y="419"
+            width="145"
+            height="76"
+            rx="8"
+            className="fill-[var(--mantine-primary-color-filled)]"
+          />
           <path
             d="M366 436H473"
-            stroke="#6F4EB1"
-            stroke-width="8"
-            stroke-linecap="round"
+            className="stroke-[var(--mantine-color-myColor-4)] dark:stroke-[var(--mantine-color-myColor-6)]"
+            strokeWidth="8"
+            strokeLinecap="round"
           />
           <path
             d="M366 456H430"
-            stroke="#6F4EB1"
-            stroke-width="8"
-            stroke-linecap="round"
+            className="stroke-[var(--mantine-color-myColor-4)] dark:stroke-[var(--mantine-color-myColor-6)]"
+            strokeWidth="8"
+            strokeLinecap="round"
           />
           <path
             d="M366 476H444"
-            stroke="#6F4EB1"
-            stroke-width="8"
-            stroke-linecap="round"
+            className="stroke-[var(--mantine-color-myColor-4)] dark:stroke-[var(--mantine-color-myColor-6)]"
+            strokeWidth="8"
+            strokeLinecap="round"
           />
         </g>
 
-        <g style="opacity: 0">
-          <rect x="18" y="422" width="145" height="76" rx="8" fill="#5C4194" />
+        <g opacity={0}>
+          <rect
+            x="18"
+            y="422"
+            width="145"
+            height="76"
+            rx="8"
+            className="fill-[var(--mantine-primary-color-filled)]"
+          />
           <path
             d="M33 439H140"
-            stroke="#6F4EB1"
-            stroke-width="8"
-            stroke-linecap="round"
+            className="stroke-[var(--mantine-color-myColor-4)] dark:stroke-[var(--mantine-color-myColor-6)]"
+            strokeWidth="8"
+            strokeLinecap="round"
           />
           <path
             d="M33 459H97"
-            stroke="#6F4EB1"
-            stroke-width="8"
-            stroke-linecap="round"
+            className="stroke-[var(--mantine-color-myColor-4)] dark:stroke-[var(--mantine-color-myColor-6)]"
+            strokeWidth="8"
+            strokeLinecap="round"
           />
           <path
             d="M33 479H111"
-            stroke="#6F4EB1"
-            stroke-width="8"
-            stroke-linecap="round"
+            className="stroke-[var(--mantine-color-myColor-4)] dark:stroke-[var(--mantine-color-myColor-6)]"
+            strokeWidth="8"
+            strokeLinecap="round"
           />
         </g>
 
-        <g style="opacity: 0">
+        <g opacity={0}>
           <rect
             x="351"
             y="194"
             width="145"
             height="168"
             rx="8"
-            fill="#5C4194"
+            className="fill-[var(--mantine-primary-color-filled)]"
           />
           <path
             d="M366 211H473"
-            stroke="#6F4EB1"
-            stroke-width="8"
-            stroke-linecap="round"
+            className="stroke-[var(--mantine-color-myColor-4)] dark:stroke-[var(--mantine-color-myColor-6)]"
+            strokeWidth="8"
+            strokeLinecap="round"
           />
           <path
             d="M366 231H430"
-            stroke="#6F4EB1"
-            stroke-width="8"
-            stroke-linecap="round"
+            className="stroke-[var(--mantine-color-myColor-4)] dark:stroke-[var(--mantine-color-myColor-6)]"
+            strokeWidth="8"
+            strokeLinecap="round"
           />
           <path
             d="M366 251H444"
-            stroke="#6F4EB1"
-            stroke-width="8"
-            stroke-linecap="round"
+            className="stroke-[var(--mantine-color-myColor-4)] dark:stroke-[var(--mantine-color-myColor-6)]"
+            strokeWidth="8"
+            strokeLinecap="round"
           />
         </g>
 
-        <g style="opacity: 0">
+        <g opacity={0}>
           <rect
             x="518"
             y="207"
             width="145"
             height="110"
             rx="8"
-            fill="#5C4194"
+            className="fill-[var(--mantine-primary-color-filled)]"
           />
           <path
             d="M533 224H640"
-            stroke="#6F4EB1"
-            stroke-width="8"
-            stroke-linecap="round"
+            className="stroke-[var(--mantine-color-myColor-4)] dark:stroke-[var(--mantine-color-myColor-6)]"
+            strokeWidth="8"
+            strokeLinecap="round"
           />
           <path
             d="M533 244H597"
-            stroke="#6F4EB1"
-            stroke-width="8"
-            stroke-linecap="round"
+            className="stroke-[var(--mantine-color-myColor-4)] dark:stroke-[var(--mantine-color-myColor-6)]"
+            strokeWidth="8"
+            strokeLinecap="round"
           />
           <path
             d="M533 264H611"
-            stroke="#6F4EB1"
-            stroke-width="8"
-            stroke-linecap="round"
+            className="stroke-[var(--mantine-color-myColor-4)] dark:stroke-[var(--mantine-color-myColor-6)]"
+            strokeWidth="8"
+            strokeLinecap="round"
           />
         </g>
 
-        <g style="opacity: 0">
-          <rect x="518" y="110" width="145" height="84" rx="8" fill="#5C4194" />
+        <g opacity={0}>
+          <rect
+            x="518"
+            y="110"
+            width="145"
+            height="84"
+            rx="8"
+            className="fill-[var(--mantine-primary-color-filled)]"
+          />
           <path
             d="M533 127H640"
-            stroke="#6F4EB1"
-            stroke-width="8"
-            stroke-linecap="round"
+            className="stroke-[var(--mantine-color-myColor-4)] dark:stroke-[var(--mantine-color-myColor-6)]"
+            strokeWidth="8"
+            strokeLinecap="round"
           />
           <path
             d="M533 147H597"
-            stroke="#6F4EB1"
-            stroke-width="8"
-            stroke-linecap="round"
+            className="stroke-[var(--mantine-color-myColor-4)] dark:stroke-[var(--mantine-color-myColor-6)]"
+            strokeWidth="8"
+            strokeLinecap="round"
           />
           <path
             d="M533 167H611"
-            stroke="#6F4EB1"
-            stroke-width="8"
-            stroke-linecap="round"
+            className="stroke-[var(--mantine-color-myColor-4)] dark:stroke-[var(--mantine-color-myColor-6)]"
+            strokeWidth="8"
+            strokeLinecap="round"
           />
         </g>
 
-        <g style="opacity: 0">
+        <g opacity={0}>
           <rect
             x="685"
             y="192"
             width="145"
             height="106"
             rx="8"
-            fill="#5C4194"
+            className="fill-[var(--mantine-primary-color-filled)]"
           />
           <path
             d="M700 209H807"
-            stroke="#6F4EB1"
-            stroke-width="8"
-            stroke-linecap="round"
+            className="stroke-[var(--mantine-color-myColor-4)] dark:stroke-[var(--mantine-color-myColor-6)]"
+            strokeWidth="8"
+            strokeLinecap="round"
           />
           <path
             d="M700 229H764"
-            stroke="#6F4EB1"
-            stroke-width="8"
-            stroke-linecap="round"
+            className="stroke-[var(--mantine-color-myColor-4)] dark:stroke-[var(--mantine-color-myColor-6)]"
+            strokeWidth="8"
+            strokeLinecap="round"
           />
           <path
             d="M700 249H778"
-            stroke="#6F4EB1"
-            stroke-width="8"
-            stroke-linecap="round"
+            className="stroke-[var(--mantine-color-myColor-4)] dark:stroke-[var(--mantine-color-myColor-6)]"
+            strokeWidth="8"
+            strokeLinecap="round"
           />
         </g>
 
-        <g style="opacity: 0">
+        <g opacity={0}>
           <rect
             x="685"
             y="311"
             width="145"
             height="106"
             rx="8"
-            fill="#5C4194"
+            className="fill-[var(--mantine-primary-color-filled)]"
           />
           <path
             d="M700 328H807"
-            stroke="#6F4EB1"
-            stroke-width="8"
-            stroke-linecap="round"
+            className="stroke-[var(--mantine-color-myColor-4)] dark:stroke-[var(--mantine-color-myColor-6)]"
+            strokeWidth="8"
+            strokeLinecap="round"
           />
           <path
             d="M700 348H764"
-            stroke="#6F4EB1"
-            stroke-width="8"
-            stroke-linecap="round"
+            className="stroke-[var(--mantine-color-myColor-4)] dark:stroke-[var(--mantine-color-myColor-6)]"
+            strokeWidth="8"
+            strokeLinecap="round"
           />
           <path
             d="M700 368H778"
-            stroke="#6F4EB1"
-            stroke-width="8"
-            stroke-linecap="round"
+            className="stroke-[var(--mantine-color-myColor-4)] dark:stroke-[var(--mantine-color-myColor-6)]"
+            strokeWidth="8"
+            strokeLinecap="round"
           />
         </g>
       </g>
@@ -337,7 +389,8 @@
           height="65"
           rx="16"
           fill="#1E1C21"
-          shape-rendering="crispEdges"
+          className="fill-[var(--mantine-primary-color-filled)]"
+          shapeRendering="crispEdges"
           id="svgButtonBackground"
         />
         <path
@@ -354,7 +407,7 @@
         <path
           d="M824.735 562.88C824.118 562.211 823 562.648 823 563.558V594.253C823 595.159 824.108 595.598 824.729 594.937L830.515 588.778L835.76 602.012C835.973 602.548 836.592 602.794 837.114 602.549L840.534 600.948C841.006 600.726 841.229 600.179 841.046 599.69L835.943 586.111H843.889C844.761 586.111 845.215 585.074 844.624 584.433L824.735 562.88Z"
           stroke="black"
-          stroke-width="2"
+          strokeWidth="2"
         />
       </g>
       <defs>
@@ -365,9 +418,9 @@
           width="250"
           height="73"
           filterUnits="userSpaceOnUse"
-          color-interpolation-filters="sRGB"
+          colorInterpolationFilters="sRGB"
         >
-          <feFlood flood-opacity="0" result="BackgroundImageFix" />
+          <feFlood floodOpacity="0" result="BackgroundImageFix" />
           <feColorMatrix
             in="SourceAlpha"
             type="matrix"
@@ -400,9 +453,9 @@
           width="31.8928"
           height="50.0901"
           filterUnits="userSpaceOnUse"
-          color-interpolation-filters="sRGB"
+          colorInterpolationFilters="sRGB"
         >
-          <feFlood flood-opacity="0" result="BackgroundImageFix" />
+          <feFlood floodOpacity="0" result="BackgroundImageFix" />
           <feColorMatrix
             in="SourceAlpha"
             type="matrix"
@@ -433,31 +486,7 @@
         </clipPath>
       </defs>
     </svg>
-  </div>
-</div>
+  );
+}
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
-<script>
-  const tl = gsap.timeline({ repeat: 0 });
-
-  tl.set("#svgCalendar", { y: 0, xPercent: 50, yPercent: 50 })
-    .to("#svgMouse", { x: -350, y: -250, duration: 1 })
-    .to("#svgMouse", { opacity: 0, duration: 0.35 })
-    .to("#svgButtonText", { opacity: 0, duration: 0.35 }, "<")
-    .to("#svgButtonBackground", { attr: { fill: "#19141a" } })
-    .to(
-      "#svgButton",
-      {
-        {{!-- scaleX: 3.504,
-        scaleY: 9.354, --}}
-        scale: 0,
-        transformOrigin: "50% 50%",
-        duration: 1,
-      },
-      "<"
-    )
-    .to("#svgButton", { opacity: 0, duration: 0.50 }, "<")
-    .to("#svgCalendar", { scale: 1, transformOrigin: "50% 50%" }, "<")
-    .to("#svgCalendar line", { opacity: 1, duration: 0.5 })
-    .to("#svgCalendar g", { opacity: 1, duration: 0.5, stagger: { grid: [2, 10], from: "start", axis: "x", amount: 1.5 }}, "<")
-</script>
+export default LandingHero;

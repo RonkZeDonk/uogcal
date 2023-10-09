@@ -8,23 +8,10 @@ import (
 	"github.com/gofiber/fiber/v2/middleware/cors"
 	"github.com/gofiber/fiber/v2/middleware/helmet"
 	"github.com/gofiber/fiber/v2/middleware/recover"
-	"github.com/gofiber/template/handlebars/v2"
 )
 
-func notFoundMiddleware(c *fiber.Ctx) error {
-	return c.Status(404).SendString("404 Not found")
-}
-
 func StartWeb() error {
-	engine := handlebars.New("./views", ".hbs")
-	if os.Getenv("ENV") == "development" {
-		engine.Reload(true)
-	}
-	addHelpers(engine)
-
-	app := fiber.New(fiber.Config{
-		Views: engine,
-	})
+	app := fiber.New(fiber.Config{})
 
 	// Misc. Middleware
 	app.Use(cors.New(cors.Config{
@@ -35,19 +22,18 @@ func StartWeb() error {
 	app.Use(helmet.New())
 
 	// Static files
-	app.Static("/files", "./public")
-	app.Static("/robots.txt", "robots.txt")
+	app.Static("/", "./dist")
 
 	// Routes
 	app.Route("/", AuthRoutes)
 	app.Route("/calendar", CalendarRoutes)
 	app.Route("/upload", UploadRoutes)
+	app.Route("/api", APIRoutes)
 
-	// Main templates route
-	app.Get("/*", handleTemplates)
-
-	// Last route left
-	app.Use(notFoundMiddleware)
+	// Vite routes
+	app.Use(func(c *fiber.Ctx) error {
+		return c.SendFile("dist/index.html")
+	})
 
 	port := os.Getenv("PORT")
 	if port == "" {

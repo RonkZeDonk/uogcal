@@ -1,20 +1,44 @@
 {
   "name": "uogcal",
-  "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
   "scripts": {
-    "buildStyles": "postcss styles/**/*.css -o public/dist.css --verbose",
-    "watchStyles": "postcss styles/**/*.css -o public/dist.css --verbose -w"
+    "dev": "vite",
+    "build": "tsc && vite build",
+    "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
+    "preview": "vite preview"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
+  "dependencies": {
+    "@mantine/core": "^7.1.0",
+    "@mantine/dates": "^7.1.0",
+    "@mantine/dropzone": "^7.1.0",
+    "@mantine/form": "^7.1.0",
+    "@mantine/hooks": "^7.1.0",
+    "@react-oauth/google": "^0.11.1",
+    "dayjs": "^1.11.10",
+    "gsap": "^3.12.2",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "react-icons": "^4.11.0",
+    "react-jwt": "^1.2.0",
+    "react-router-dom": "^6.16.0"
+  },
   "devDependencies": {
-    "autoprefixer": "^10.4.14",
-    "cssnano": "^6.0.1",
-    "postcss": "^8.4.25",
-    "postcss-cli": "^10.1.0",
-    "tailwindcss": "^3.3.2"
+    "@types/react": "^18.2.15",
+    "@types/react-dom": "^18.2.7",
+    "@typescript-eslint/eslint-plugin": "^6.0.0",
+    "@typescript-eslint/parser": "^6.0.0",
+    "@vitejs/plugin-react-swc": "^3.3.2",
+    "autoprefixer": "^10.4.16",
+    "eslint": "^8.45.0",
+    "eslint-plugin-react-hooks": "^4.6.0",
+    "eslint-plugin-react-refresh": "^0.4.3",
+    "postcss": "^8.4.31",
+    "postcss-preset-mantine": "^1.7.0",
+    "postcss-simple-vars": "^7.0.1",
+    "tailwindcss": "^3.3.3",
+    "typescript": "^5.0.2",
+    "vite": "^4.4.5"
   }
 }

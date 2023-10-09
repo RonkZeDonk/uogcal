@@ -13,9 +13,6 @@ func CalendarRoutes(r fiber.Router) {
 	r.Get("/", func(c *fiber.Ctx) error {
 		claims, err := GetAuthClaims(c)
 		if err != nil {
-			c.Set(fiber.HeaderCacheControl, "no-store, must-revalidate")
-			return c.Redirect("/calendar/" + claims.Id)
-		} else {
 			// Demo event
 			cal := calendar.NewCalendar("UoG Calendar Demo")
 			now := time.Now()
@@ -37,6 +34,9 @@ func CalendarRoutes(r fiber.Router) {
 			c.Attachment("courses.ics")
 			return c.SendString(cal.GenerateCalendar())
 		}
+
+		c.Set(fiber.HeaderCacheControl, "no-store, must-revalidate")
+		return c.Redirect("/calendar/" + claims.Id)
 	})
 
 	r.Get("/:id", func(c *fiber.Ctx) error {

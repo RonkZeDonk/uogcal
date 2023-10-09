@@ -18,11 +18,11 @@ of volunteer contributors.
 
 Run two different terminal sessions:
 
-- on session A run `make watchStyles`
-  - this will run the Tailwind CLI to compile a CSS bundle
+- on session A run `pnpm build`
+  - this doesn't watch the project... you will need to rebuild each time you
+    make a change to a ts file.
 - on session B run the go project (ie. `go run cmd/main.go`)
-  - you can set the `ENV` environment variable to `development` to enable
-    hot-reloading for .hbs files (ie. `ENV=development go run cmd/main.go`)
+  - you can change the port using the PORT environment variable
 
 ## Production Information
 

@@ -1,44 +1,53 @@
-// Code adapted from:
+// Regex and glob adapted from:
 // https://omarelhawary.me/blog/file-based-routing-with-react-router/
 
-import { FC, Fragment } from "react";
 import { RouteObject, createBrowserRouter } from "react-router-dom";
 import Link from "./components/Link";
 
-type ImportType = Record<string, { default: FC }>;
-const ROUTES: ImportType = import.meta.glob("/src/pages/**/[a-z[]*.tsx", { eager: true });
-
-const routes = Object.keys(ROUTES).map((route) => {
-  // Each replace does the following: (taken from the omarelhawary blog)
-  //  - Remove /src/pages, index and .tsx from each path
-  //  - Replace [...param] patterns with *
-  //  - Replace [param] patterns with :param
-  const path = route
-    // change from blog: added a start of line directive (^) to this replace call
-    // if there is a file in path /src/pages/src/pages/ it would have been ignored
-    .replace(/^\/src\/pages|index|\.tsx$/g, "")
-    .replace(/\[\.{3}.+\]/, "*")
-    .replace(/\[(.+)\]/, ":$1");
-
-  return { path, element: ROUTES[route].default };
-});
-
-const buildRoutes = () => {
-  const arr: RouteObject[] = [];
-
-  for (const { path, element: Element = Fragment } of routes) {
-    arr.push({ path, element: <Element /> });
-  }
-
-  arr.push({ path: "*", element: (
-    <>
-      <h1>Page Not Found</h1>
-      <Link to="/">{"<"} Go Home</Link>
-    </>
-  ) });
-
-  return arr;
+type PageType = {
+  default?: () => JSX.Element;
 };
+const pages = import.meta.glob<PageType>("/src/pages/**/[a-z[]*.tsx");
+
+function buildRoutes() {
+  const routes: RouteObject[] = Object.keys(pages).map((page) => {
+    // Each replace does the following: (taken from the omarelhawary blog)
+    //  - Remove /src/pages, index and .tsx from each path
+    //  - Replace [...param] patterns with *
+    //  - Replace [param] patterns with :param
+    const path = page
+      // changes from the blog:
+      // - added a start of line directive (^) to this replace call
+      //   - if there is a file in path /src/pages/src/pages/ it would have been ignored
+      // - match / before and . after index match so that pages like "someindex" can exist
+      .replace(/^\/src\/pages|(?:\/)index(?=\.)|\.tsx$/g, "")
+      .replace(/\[\.{3}.+\]/, "*")
+      .replace(/\[(.+)\]/, ":$1");
+
+    return {
+      path,
+      lazy: async () => {
+        const { default: Component } = await pages[page]();
+
+        return {
+          Component: Component || (() => <></>),
+        };
+      },
+    };
+  });
+
+  routes.push({
+    path: "*",
+    element: (
+      <>
+        <h1>Page Not Found</h1>
+        <Link to="/">{"<"} Go Home</Link>
+      </>
+    ),
+  });
+
+  return routes;
+}
 
 const Router = createBrowserRouter(buildRoutes());
 

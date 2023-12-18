@@ -180,4 +180,16 @@ function AccountPage() {
   );
 }
 
+// TODO this catch-all isn't the best way to fix this problem
+export function ErrorBoundary() {
+  return (
+    <MainLayout>
+      <div>
+        There was a problem...{" "}
+        <Link to="/import" className="underline">Did you import all your courses?</Link>
+      </div>
+    </MainLayout>
+  );
+}
+
 export default AccountPage;

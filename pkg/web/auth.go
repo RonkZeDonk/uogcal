@@ -1,7 +1,11 @@
 package web
 
 import (
+	"encoding/json"
+	"io"
+	"net/http"
 	"os"
+	"strings"
 	"time"
 
 	"github.com/RonkZeDonk/uogcal/pkg/database"
@@ -21,6 +25,20 @@ type UserLogin struct {
 type UserSignUp struct {
 	Username string `json:"username" xml:"username" form:"username"`
 	Password string `json:"password" xml:"password" form:"password"`
+}
+
+type GoogleAccessToken struct {
+	AccessToken string `json:"accessToken"`
+}
+type GoogleUserInfo struct {
+	Id            string `json:"id"`
+	Email         string `json:"email"`
+	VerifiedEmail bool   `json:"verifiedEmail"`
+	Name          string `json:"name"`
+	GivenName     string `json:"givenName"`
+	FamilyName    string `json:"familyName"`
+	Picture       string `json:"picture"`
+	Locale        string `json:"locale"`
 }
 
 type ClaimsMap struct {
@@ -103,6 +121,29 @@ func removeJWTCookie(c *fiber.Ctx) {
 	c.Cookie(&cookie)
 }
 
+func getGoogleIdFromAT(accessToken string) (GoogleUserInfo, error) {
+	req, err := http.NewRequest("GET", "https://www.googleapis.com/oauth2/v1/userinfo?alt=json", strings.NewReader(""))
+	if err != nil {
+		return GoogleUserInfo{}, err
+	}
+	req.Header.Add("Authorization", "Bearer "+accessToken)
+	client := &http.Client{}
+	res, err := client.Do(req)
+	if err != nil {
+		return GoogleUserInfo{}, err
+	}
+	body, err := io.ReadAll(res.Body)
+	if err != nil {
+		return GoogleUserInfo{}, err
+	}
+
+	var gRes GoogleUserInfo
+	if err = json.Unmarshal(body, &gRes); err != nil {
+		return GoogleUserInfo{}, err
+	}
+	return gRes, nil
+}
+
 func deauthJWT(c *fiber.Ctx, expiry time.Duration) error {
 	token := c.Cookies(JWT_COOKIE_KEY)
 	return redis.Set(token, 1, expiry)
@@ -114,13 +155,13 @@ func AuthRoutes(r fiber.Router) {
 		Filter: func(c *fiber.Ctx) bool {
 			url := c.OriginalURL()
 			switch url {
-			case "/auth/login":
-				fallthrough
 			case "/auth/login/":
 				return true
-			case "/auth/register":
-				fallthrough
 			case "/auth/register/":
+				return true
+			case "/auth/google/login":
+				return true
+			case "/auth/google/register":
 				return true
 			}
 			return false
@@ -170,19 +211,6 @@ func AuthRoutes(r fiber.Router) {
 		return c.Redirect("/")
 	})
 
-	r.Get("/auth/logout", func(c *fiber.Ctx) error {
-		timeUntilExpire, err := GetJWTExpiration(c)
-		if err != nil {
-			return c.SendString(err.Error())
-		}
-
-		deauthJWT(c, timeUntilExpire)
-		removeJWTCookie(c)
-
-		c.Set(fiber.HeaderCacheControl, "no-store, must-revalidate")
-		return c.Redirect("/")
-	})
-
 	r.Post("/auth/register", func(c *fiber.Ctx) error {
 		c.Accepts(fiber.MIMEApplicationJSON, fiber.MIMEApplicationForm)
 
@@ -209,6 +237,77 @@ func AuthRoutes(r fiber.Router) {
 			return c.SendStatus(fiber.StatusInternalServerError)
 		}
 		c.Cookie(jwtCookie)
+
+		c.Set(fiber.HeaderCacheControl, "no-store, must-revalidate")
+		return c.Redirect("/")
+	})
+
+	r.Post("/auth/google/login", func(c *fiber.Ctx) error {
+		var token GoogleAccessToken
+		if err := json.Unmarshal(c.Request().Body(), &token); err != nil {
+			return c.Status(fiber.StatusInternalServerError).SendString(err.Error())
+		}
+
+		gRes, err := getGoogleIdFromAT(token.AccessToken)
+		if err != nil {
+			return c.Status(fiber.StatusInternalServerError).SendString(err.Error())
+		}
+
+		username, uuid, err := database.GetOAuthUser(gRes.Id)
+		if err != nil {
+			return c.Status(fiber.StatusInternalServerError).SendString(err.Error())
+		}
+
+		jwtCookie, err := createJWTCookie(ClaimsMap{
+			User: username,
+			Id:   uuid,
+		})
+		if err != nil {
+			return c.SendStatus(fiber.StatusInternalServerError)
+		}
+		c.Cookie(jwtCookie)
+
+		c.Set(fiber.HeaderCacheControl, "no-store, must-revalidate")
+		return c.Redirect("/")
+	})
+
+	r.Post("/auth/google/register", func(c *fiber.Ctx) error {
+		var token GoogleAccessToken
+		if err := json.Unmarshal(c.Request().Body(), &token); err != nil {
+			return c.Status(fiber.StatusInternalServerError).SendString(err.Error())
+		}
+
+		gRes, err := getGoogleIdFromAT(token.AccessToken)
+		if err != nil {
+			return c.Status(fiber.StatusInternalServerError).SendString(err.Error())
+		}
+
+		username, uuid, err := database.AddOAuthUser(gRes.Id)
+		if err != nil {
+			return c.Status(fiber.StatusInternalServerError).SendString(err.Error())
+		}
+
+		jwtCookie, err := createJWTCookie(ClaimsMap{
+			User: username,
+			Id:   uuid.String(),
+		})
+		if err != nil {
+			return c.SendStatus(fiber.StatusInternalServerError)
+		}
+		c.Cookie(jwtCookie)
+
+		c.Set(fiber.HeaderCacheControl, "no-store, must-revalidate")
+		return c.Redirect("/")
+	})
+
+	r.Get("/auth/logout", func(c *fiber.Ctx) error {
+		timeUntilExpire, err := GetJWTExpiration(c)
+		if err != nil {
+			return c.SendString(err.Error())
+		}
+
+		deauthJWT(c, timeUntilExpire)
+		removeJWTCookie(c)
 
 		c.Set(fiber.HeaderCacheControl, "no-store, must-revalidate")
 		return c.Redirect("/")

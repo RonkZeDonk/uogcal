@@ -9,7 +9,7 @@ function SignUpPage() {
       <Center mih="inherit">
         <Box>
           <Title order={1}>Register</Title>
-          <AuthForm actionText="Sign up" formAction="/auth/register" />
+          <AuthForm type="register" />
           <Space h="2rem" />
           <Center>
             <Link to="/login">Already have an account?</Link>

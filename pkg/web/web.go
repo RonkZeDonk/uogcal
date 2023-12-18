@@ -6,7 +6,6 @@ import (
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/cors"
-	"github.com/gofiber/fiber/v2/middleware/helmet"
 	"github.com/gofiber/fiber/v2/middleware/recover"
 )
 
@@ -19,7 +18,9 @@ func StartWeb() error {
 		AllowHeaders: "Origin, Content-Type, Accept",
 	}))
 	app.Use(recover.New())
-	app.Use(helmet.New())
+	// TODO temporarily disabled for Google OAuth to work.
+	//  - CSFR is the prime suspect for breaking OAuth
+	// app.Use(helmet.New())
 
 	// Static files
 	app.Static("/", "./dist")

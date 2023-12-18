@@ -3,7 +3,6 @@ import Router from "./Router";
 import { MantineColorsTuple, MantineProvider, createTheme } from "@mantine/core";
 import { GoogleOAuthProvider } from "@react-oauth/google";
 
-
 const myColor: MantineColorsTuple = [
   "#f7ecff",
   "#e7d7fa",

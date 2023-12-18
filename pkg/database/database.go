@@ -70,6 +70,31 @@ func AddUser(displayName string, password string) (uuid.UUID, error) {
 	return userUUID, nil
 }
 
+func AddOAuthUser(oauthId string) (string, uuid.UUID, error) {
+	pool := getInstance()
+
+	row := pool.QueryRow(context.Background(), "SELECT 1 FROM oauth_user ou WHERE ou.user_uid=$1;", oauthId)
+	var res string
+	if row.Scan(&res) == nil {
+		return "", uuid.Nil, fmt.Errorf("user already exists. can't register")
+	}
+
+	userUUID := uuid.Must(uuid.NewUUID())
+
+	username := userUUID.String()
+	_, err := pool.Exec(context.Background(), `INSERT INTO uogcal_user VALUES($1, $2, $3);`, userUUID, username, "")
+	if err != nil {
+		return "", uuid.Nil, err
+	}
+
+	_, err = pool.Exec(context.Background(), `INSERT INTO oauth_user VALUES($1, $2);`, oauthId, userUUID)
+	if err != nil {
+		return "", uuid.Nil, err
+	}
+
+	return username, userUUID, nil
+}
+
 // Add a section+meetings
 func AddSection(section CourseSection, meetings []SectionMeeting) error {
 	pool := getInstance()
@@ -185,6 +210,20 @@ func GetUserPassword(username string) (string, string, error) {
 	err := row.Scan(&uid, &password)
 
 	return uid, string(password), err
+}
+
+func GetOAuthUser(oauthId string) (string, string, error) {
+	pool := getInstance()
+	row := pool.QueryRow(
+		context.Background(),
+		`SELECT display_name, user_uid FROM oauth_user ou JOIN uogcal_user uu ON ou.user_uid=uu.uid WHERE oauth_id=$1;`,
+		oauthId,
+	)
+	var username string
+	var uid string
+	err := row.Scan(&username, &uid)
+
+	return username, uid, err
 }
 
 func CheckCourseExists(code string) bool {

@@ -4,13 +4,16 @@ import { IconContext } from "react-icons";
 import { FaDiscord, FaGoogle, FaGithub, FaSlack } from "react-icons/fa";
 import Link from "./Link";
 import { useGoogleLogin } from "@react-oauth/google";
+import { useNavigate } from "react-router-dom";
+
+type AuthType = "login" | "register";
+type OAuthType = "google" | "disabled";
 
 interface AccountFormProps {
-  actionText: string;
-  formAction: string;
+  type: AuthType;
 }
 
-function AuthForm({ actionText, formAction }: AccountFormProps) {
+function AuthForm({ type }: AccountFormProps) {
   const [showDialog, setShowDialog] = useState(false);
   const [username, setUsername] = useState("");
   const shouldShowUserError =
@@ -18,16 +21,40 @@ function AuthForm({ actionText, formAction }: AccountFormProps) {
   const [password, setPassword] = useState("");
   const shouldShowPassError =
     password && (password.length < 8 || password.length > 64);
+  const actionText = type == "login" ? "Log In" : "Sign Up";
+  const navigate = useNavigate();
 
-  const googleLogin = useGoogleLogin({
-    onSuccess: console.log,
-  });
+  const authFunctions: Record<OAuthType, () => void> = {
+    "google": useGoogleLogin({
+      onSuccess: res => {
+        fetch("/auth/google/" + type, {
+          method: "POST",
+          body: JSON.stringify({
+            accessToken: res.access_token,
+          }),
+        }).then((r) => {
+          if (!r.ok) {
+            // TODO inform the user that they may already have an account
+            setShowDialog(true);
+            return;
+          }
+
+          if (type == "register") {
+            navigate("/import");
+          } else {
+            navigate("/account");
+          }
+        });
+      },
+    }),
+    "disabled": () => setShowDialog(true),
+  };
 
   return (
     <>
       <Box w="16rem">
         <form
-          action={formAction}
+          action={"/auth/" + type}
           method="post"
           encType="multipart/form-data"
           className="[&>*]:my-2"
@@ -79,16 +106,16 @@ function AuthForm({ actionText, formAction }: AccountFormProps) {
           </Center>
           <IconContext.Provider value={{ size: "28px" }}>
             <Flex justify="space-around" mx="lg" pt="xs" pos="relative">
-              <Link to="" onClick={() => googleLogin()}>
+              <Link to="" onClick={authFunctions["google"]}>
                 <FaGoogle />
               </Link>
-              <Link to="" onClick={() => setShowDialog(true)}>
+              <Link to="" onClick={authFunctions["disabled"]}>
                 <FaGithub />
               </Link>
-              <Link to="" onClick={() => setShowDialog(true)}>
+              <Link to="" onClick={authFunctions["disabled"]}>
                 <FaDiscord />
               </Link>
-              <Link to="" onClick={() => setShowDialog(true)}>
+              <Link to="" onClick={authFunctions["disabled"]}>
                 <FaSlack />
               </Link>
             </Flex>
@@ -100,8 +127,8 @@ function AuthForm({ actionText, formAction }: AccountFormProps) {
             withCloseButton
             onClose={() => setShowDialog(false)}
           >
-            This authentication method is currently unavailable... Please try
-            another
+            There was a problem with this authentication method... Please try
+            again or use another method
           </Dialog>
         </form>
       </Box>

@@ -9,7 +9,7 @@ function LoginPage() {
       <Center mih="inherit">
         <Box>
           <Title order={1}>Login</Title>
-          <AuthForm actionText="Login" formAction="/auth/login" />
+          <AuthForm type="login" />
           <Space h="2rem" />
           <Center>
             <Link to="/signup">Don't have an account?</Link>

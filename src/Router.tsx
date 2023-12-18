@@ -6,7 +6,7 @@ import Link from "./components/Link";
 
 type PageType = {
   default?: () => JSX.Element;
-};
+} & RouteObject;
 const pages = import.meta.glob<PageType>("/src/pages/**/[a-z[]*.tsx");
 
 function buildRoutes() {
@@ -27,10 +27,11 @@ function buildRoutes() {
     return {
       path,
       lazy: async () => {
-        const { default: Component } = await pages[page]();
+        const { default: Component, ...others } = await pages[page]();
 
         return {
           Component: Component || (() => <></>),
+          ...others,
         };
       },
     };

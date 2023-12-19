@@ -27,7 +27,7 @@ function App() {
   return (
     <>
       <MantineProvider theme={mantineTheme} defaultColorScheme="auto">
-        <GoogleOAuthProvider clientId="646058108928-c23o6btqeqlkbg1iglfr10vbq6fo16ju.apps.googleusercontent.com">
+        <GoogleOAuthProvider clientId={import.meta.env.VITE_G_OAUTH_CLIENT}>
           <RouterProvider router={Router} />
         </GoogleOAuthProvider>
       </MantineProvider>

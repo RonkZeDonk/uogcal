@@ -1,0 +1,59 @@
+services:
+  server:
+    build:
+      context: .
+    environment:
+      PORT: 3000
+      NODE_ENV: production
+      PG_HOST: db
+      PG_USERNAME: postgres
+      PG_PASSWORD: ${PG_PASSWORD}
+      PG_DATABASE: ${PG_DATABASE}
+      REDIS_HOST: redis
+      JWT_SECRET: ${JWT_SECRET}
+      VITE_G_OAUTH_CLIENT: ${VITE_G_OAUTH_CLIENT}
+    volumes:
+      - .env:/app/.env
+    ports:
+      - 3000:3000
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+  db:
+    image: postgres:11-alpine
+    restart: always
+    user: postgres
+    volumes:
+      - ./migrations:/migrations
+      - ./docker/migrate-up.sh:/docker-entrypoint-initdb.d/migrate-up.sh
+    environment:
+      POSTGRES_DB: ${PG_DATABASE}
+      POSTGRES_PASSWORD: ${PG_PASSWORD}
+    expose:
+      - 5432
+    healthcheck:
+      test: [ "CMD", "pg_isready" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+  redis:
+    image: redis:5.0-alpine
+    restart: always
+    command: redis-server --save 20 1 --loglevel warning
+    volumes:
+      - redis-data:/data
+    environment:
+      - name=value
+    expose:
+      - 6379
+    healthcheck:
+      test: [ "CMD", "redis-cli", "--raw", "incr", "ping" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  db-data:
+  redis-data:

@@ -153,11 +153,11 @@ func AuthRoutes(r fiber.Router) {
 	r.Use([]string{"/auth", "/me", "/upload"}, jwtware.New(jwtware.Config{
 		TokenLookup: "cookie:" + JWT_COOKIE_KEY,
 		Filter: func(c *fiber.Ctx) bool {
-			url := c.OriginalURL()
+			url := strings.TrimRight(c.OriginalURL(), "/")
 			switch url {
-			case "/auth/login/":
+			case "/auth/login":
 				return true
-			case "/auth/register/":
+			case "/auth/register":
 				return true
 			case "/auth/google/login":
 				return true

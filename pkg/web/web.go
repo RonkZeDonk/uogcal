@@ -1,15 +1,18 @@
 package web
 
 import (
+	"embed"
 	"fmt"
+	"net/http"
 	"os"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/cors"
+	"github.com/gofiber/fiber/v2/middleware/filesystem"
 	"github.com/gofiber/fiber/v2/middleware/recover"
 )
 
-func StartWeb() error {
+func StartWeb(static embed.FS) error {
 	app := fiber.New(fiber.Config{})
 
 	// Misc. Middleware
@@ -22,9 +25,6 @@ func StartWeb() error {
 	//  - CSFR is the prime suspect for breaking OAuth
 	// app.Use(helmet.New())
 
-	// Static files
-	app.Static("/", "./dist")
-
 	// Routes
 	app.Route("/", AuthRoutes)
 	app.Route("/calendar", CalendarRoutes)
@@ -32,9 +32,11 @@ func StartWeb() error {
 	app.Route("/api", APIRoutes)
 
 	// Vite routes
-	app.Use(func(c *fiber.Ctx) error {
-		return c.SendFile("dist/index.html")
-	})
+	app.Use("/", filesystem.New(filesystem.Config{
+		Root:         http.FS(static),
+		PathPrefix:   "/dist",
+		NotFoundFile: "/dist/index.html",
+	}))
 
 	port := os.Getenv("PORT")
 	if port == "" {

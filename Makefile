@@ -1,33 +1,30 @@
 GOOS=linux
 GOARCH=amd64
 
-ENTRYPOINT=cmd/main.go
-
 OUTPUT=main-${GOOS}-${GOARCH}
-PACKAGE=uogcal.tar.gz
 
-.PHONY: build backend frontend package fmt clean
+.PHONY: build backend frontend package fmt distclean
 
-build: backend frontend
+build: frontend backend
 
 ${OUTPUT}: backend
 dist: frontend
 
 backend:
 ifeq ($(GOARM),)
-	GOOS=${GOOS} GOARCH=${GOARCH} go build -o ${OUTPUT} ${ENTRYPOINT}
+	GOOS=${GOOS} GOARCH=${GOARCH} go build -o ${OUTPUT}
 else
-	GOOS=${GOOS} GOARCH=${GOARCH} GOARM=${GOARM} go build -o ${OUTPUT} ${ENTRYPOINT}
+	GOOS=${GOOS} GOARCH=${GOARCH} GOARM=${GOARM} go build -o ${OUTPUT}
 endif
 
 frontend:
 	NODE_ENV=production pnpm build
 
-package: ${OUTPUT} dist
-	tar -czvf ${PACKAGE} ${OUTPUT} dist
-
 fmt:
 	go fmt -x ./...
 
 clean:
-	rm -rf ${OUTPUT} ${PACKAGE} dist
+	rm main-*-*
+
+distclean:
+	rm -rf main-*-* dist

@@ -19,7 +19,7 @@ import { MdCloudDone, MdCloudUpload } from "react-icons/md";
 import "@mantine/dropzone/styles.css";
 import { IconContext } from "react-icons";
 
-const BOOKMARKLET_LOCATION = "/files/getCourses.js";
+const BOOKMARKLET_LOCATION = "/getCourses.js";
 
 function ImportPage() {
   const navigate = useNavigate();

@@ -3,12 +3,10 @@ package web
 import (
 	"embed"
 	"fmt"
-	"net/http"
 	"os"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/cors"
-	"github.com/gofiber/fiber/v2/middleware/filesystem"
 	"github.com/gofiber/fiber/v2/middleware/recover"
 )
 
@@ -31,12 +29,12 @@ func StartWeb(static embed.FS) error {
 	app.Route("/upload", UploadRoutes)
 	app.Route("/api", APIRoutes)
 
-	// Vite routes
-	app.Use("/", filesystem.New(filesystem.Config{
-		Root:         http.FS(static),
-		PathPrefix:   "/dist",
-		NotFoundFile: "/dist/index.html",
-	}))
+	// Static routes
+	app.Use("/", StaticAssets(static))
+
+	app.Use(func(c *fiber.Ctx) error {
+		return c.SendStatus(fiber.StatusInternalServerError)
+	})
 
 	port := os.Getenv("PORT")
 	if port == "" {

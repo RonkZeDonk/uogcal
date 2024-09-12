@@ -106,7 +106,7 @@ function AuthForm({ type }: AccountFormProps) {
           </Center>
           <IconContext.Provider value={{ size: "28px" }}>
             <Flex justify="space-around" mx="lg" pt="xs" pos="relative">
-              <Link to="" onClick={authFunctions["google"]}>
+              <Link to="" onClick={authFunctions["disabled"]}>
                 <FaGoogle />
               </Link>
               <Link to="" onClick={authFunctions["disabled"]}>

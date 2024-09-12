@@ -9,7 +9,7 @@ import (
 	"github.com/joho/godotenv"
 )
 
-//go:embed dist
+//go:embed all:dist
 var dist embed.FS
 
 func main() {

@@ -18,10 +18,8 @@ of volunteer contributors.
 
 Run two different terminal sessions:
 
-- on session A run `pnpm build`
-  - this doesn't watch the project... you will need to rebuild each time you
-    make a change to a ts file.
-- on session B run the go project (ie. `go run cmd/main.go`)
+- on session A run `pnpm dev`
+- on session B run the go project (ie. `go run .`)
   - you can change the port using the PORT environment variable
 
 ## Production Information

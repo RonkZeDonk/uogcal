@@ -1,6 +1,8 @@
 module github.com/RonkZeDonk/uogcal
 
-go 1.20
+go 1.22.3
+
+toolchain go1.22.7
 
 require (
 	github.com/gofiber/contrib/jwt v1.0.3
@@ -9,6 +11,7 @@ require (
 	github.com/google/uuid v1.3.0
 	github.com/jackc/pgx/v5 v5.4.1
 	github.com/joho/godotenv v1.5.1
+	github.com/olivere/vite v0.0.0-20240914084000-a33480a25612
 	github.com/redis/go-redis/v9 v9.2.0
 	github.com/urfave/cli/v2 v2.25.7
 )

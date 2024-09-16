@@ -30,10 +30,10 @@ func StartWeb(static embed.FS) error {
 	app.Route("/api", APIRoutes)
 
 	// Static routes
-	app.Use("/", StaticAssets(static))
+	app.Route("/", StaticAssets(static))
 
 	app.Use(func(c *fiber.Ctx) error {
-		return c.SendStatus(fiber.StatusInternalServerError)
+		return c.SendStatus(fiber.StatusNotFound)
 	})
 
 	port := os.Getenv("PORT")

@@ -33,18 +33,22 @@ function Index() {
                 <Group className="max-sm:self-center">
                   <Button
                     size="md"
-                    onClick={() => !isLoggedIn() && navigate("/signup")}
+                    onClick={() =>
+                      !isLoggedIn() ? navigate("/signup") : navigate("/account")
+                    }
                     variant="filled"
                   >
-                    Get Started
+                    {!isLoggedIn() ? "Get Started" : "My Courses"}
                   </Button>
                   <Button
                     size="md"
                     variant="subtle"
-                    onClick={() => !isLoggedIn() && navigate("/login")}
+                    onClick={() =>
+                      !isLoggedIn() ? navigate("/login") : navigate("/import")
+                    }
                   >
                     {/* TODO create a learn more button or something of the sorts */}
-                    Returning user
+                    {!isLoggedIn() ? "Returning User" : "Import courses"}
                   </Button>
                 </Group>
                 <Space h="xl" />

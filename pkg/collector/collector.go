@@ -27,21 +27,23 @@ type searchResults struct {
 }
 
 type sectionResults struct {
-	TermsAndSections []struct {
-		Sections []struct {
-			Section struct {
-				SectionNameDisplay  string
-				SectionTitleDisplay string
-				TermId              string
+	SectionsRetrieved struct {
+		TermsAndSections []struct {
+			Sections []struct {
+				Section struct {
+					SectionNameDisplay  string
+					SectionTitleDisplay string
+					TermId              string
 
-				FormattedMeetingTimes []struct {
-					InstructionalMethodDisplay string
-					BuildingDisplay            string
-					RoomDisplay                string
-					DatesDisplay               string
-					StartTime                  string
-					EndTime                    string
-					Days                       []int8
+					FormattedMeetingTimes []struct {
+						InstructionalMethodDisplay string
+						BuildingDisplay            string
+						RoomDisplay                string
+						DatesDisplay               string
+						StartTime                  string
+						EndTime                    string
+						Days                       []int8
+					}
 				}
 			}
 		}
@@ -61,6 +63,7 @@ func setHeaders(r *http.Request, verifyHeader string, verifyCookie string) {
 	r.Header.Add("Origin", "https://colleague-ss.uoguelph.ca")
 	r.Header.Add("DNT", "1")
 	r.Header.Add("Connection", "keep-alive")
+	r.Header.Add("Accept-Encoding", "")
 
 	r.Header.Add("__RequestVerificationToken", verifyHeader)
 	r.Header.Add("Cookie", verifyCookie)
@@ -69,7 +72,17 @@ func setHeaders(r *http.Request, verifyHeader string, verifyCookie string) {
 func GetVerificationTokenAndCookie() (Verification, error) {
 	verify := Verification{}
 
-	res, err := http.Get("https://colleague-ss.uoguelph.ca/Student/Courses")
+	client := &http.Client{}
+	req, err := http.NewRequest("GET", "https://colleague-ss.uoguelph.ca/Student/Courses", nil)
+	if err != nil {
+		return Verification{}, err
+	}
+	req.Header.Add("User-Agent", "curl/8.5.0")
+	req.Header.Add("Accept", "*/*")
+	req.Header.Add("Connection", "keep-alive")
+	req.Header.Add("Accept-Encoding", "")
+
+	res, err := client.Do(req)
 	if err != nil {
 		return Verification{}, err
 	}
@@ -97,15 +110,16 @@ func GetVerificationTokenAndCookie() (Verification, error) {
 
 func GetSectionData(term string, sectionCode string, verifyHeader string, verifyCookie string) (database.CourseSection, []database.SectionMeeting, error) {
 	courseCode := strings.Join(strings.Split(sectionCode, "*")[:2], "*")
+	sec := strings.Split(sectionCode, "*")
 
 	client := &http.Client{}
 	req, err := http.NewRequest(
 		"POST",
-		"https://colleague-ss.uoguelph.ca/Student/Courses/SearchAsync",
+		"https://colleague-ss.uoguelph.ca/Student/Courses/PostSearchCriteria",
 		strings.NewReader(
 			fmt.Sprintf(
-				`{"searchParameters":"{\"keyword\":\"%v\",\"terms\":[],\"requirement\":null,\"subrequirement\":null,\"courseIds\":null,\"sectionIds\":null,\"requirementText\":null,\"subrequirementText\":\"\",\"group\":null,\"startTime\":null,\"endTime\":null,\"openSections\":null,\"subjects\":[],\"academicLevels\":[],\"courseLevels\":[],\"synonyms\":[],\"courseTypes\":[],\"topicCodes\":[],\"days\":[],\"locations\":[],\"faculty\":[],\"onlineCategories\":null,\"keywordComponents\":[],\"startDate\":null,\"endDate\":null,\"startsAtTime\":null,\"endsByTime\":null,\"pageNumber\":1,\"sortOn\":\"None\",\"sortDirection\":\"Ascending\",\"subjectsBadge\":[],\"locationsBadge\":[],\"termFiltersBadge\":[],\"daysBadge\":[],\"facultyBadge\":[],\"academicLevelsBadge\":[],\"courseLevelsBadge\":[],\"courseTypesBadge\":[],\"topicCodesBadge\":[],\"onlineCategoriesBadge\":[],\"openSectionsBadge\":\"\",\"openAndWaitlistedSectionsBadge\":\"\",\"subRequirementText\":null,\"quantityPerPage\":30,\"openAndWaitlistedSections\":null,\"searchResultsView\":\"CatalogListing\"}"}`,
-				sectionCode,
+				`{"keywordComponents":[{"subject":"%v","courseNumber":"%v","section":"%v"}]}`,
+				sec[0], sec[1], sec[2],
 			),
 		),
 	)
@@ -119,7 +133,7 @@ func GetSectionData(term string, sectionCode string, verifyHeader string, verify
 		return database.CourseSection{}, []database.SectionMeeting{}, err
 	}
 	if res.StatusCode != 200 {
-		return database.CourseSection{}, []database.SectionMeeting{}, errors.New("status was not 200")
+		return database.CourseSection{}, []database.SectionMeeting{}, errors.New(res.Status)
 	}
 
 	bodyRaw, err := io.ReadAll(res.Body)
@@ -149,7 +163,7 @@ func GetSectionData(term string, sectionCode string, verifyHeader string, verify
 
 	req, err = http.NewRequest(
 		"POST",
-		"https://colleague-ss.uoguelph.ca/Student/Courses/SectionsAsync",
+		"https://colleague-ss.uoguelph.ca/Student/Courses/Sections",
 		strings.NewReader(
 			fmt.Sprintf(
 				`{"courseId":"%v","sectionIds":[%v]}`,
@@ -185,7 +199,7 @@ func GetSectionData(term string, sectionCode string, verifyHeader string, verify
 
 	var section database.CourseSection
 	var meetings []database.SectionMeeting
-	for _, ts := range sectionResults.TermsAndSections {
+	for _, ts := range sectionResults.SectionsRetrieved.TermsAndSections {
 		for _, s := range ts.Sections {
 			if s.Section.TermId != term {
 				continue

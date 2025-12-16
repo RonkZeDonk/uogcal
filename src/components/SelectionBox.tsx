@@ -2,20 +2,23 @@ import {
   useMantineTheme,
   Combobox,
   Loader,
-  Select,
+  // Select,
+  Autocomplete,
 } from "@mantine/core";
 
 type SelectionBoxProps = {
+  value?: string;
   label: string;
   onSelect?: (n: string | null) => void;
   placeholder: string;
-  options: string[];
+  options?: string[];
   disabled?: boolean;
   loading?: boolean;
   side?: "right" | "left"; // assuming centre by default
 };
 
 export const SelectionBox = ({
+  value,
   label,
   placeholder,
   options,
@@ -34,19 +37,20 @@ export const SelectionBox = ({
   const radiusStr = `${leftRadius} ${rightRadius} ${rightRadius} ${leftRadius}`;
 
   return (
-    <Select
+    <Autocomplete
       label={label}
       placeholder={placeholder}
       data={options}
-      searchable
+      value={value}
+      // searchable
       disabled={disabled || loading}
       radius={radiusStr}
       selectFirstOptionOnChange
       onChange={(v) => onSelect && onSelect(v)}
       rightSectionPointerEvents="none"
       rightSection={loading ? <Loader size={18} /> : <Combobox.Chevron />}
-      checkIconPosition="right"
-      nothingFoundMessage={`${label} not found :(`}
+      // checkIconPosition="right"
+      // nothingFoundMessage={options && `${label} not found :(`}
     />
   );
 };

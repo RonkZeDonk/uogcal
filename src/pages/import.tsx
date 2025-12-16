@@ -1,193 +1,90 @@
-import ImportSection from "@/components/ImportSection";
-import Link from "@/components/Link";
 import MainLayout from "@/layouts/main";
-import {
-  Button,
-  Code,
-  Group,
-  List,
-  Space,
-  Text,
-  Title,
-  rem,
-} from "@mantine/core";
-import { Dropzone, FileWithPath } from "@mantine/dropzone";
-import { useEffect, useState } from "react";
+import { Button, Group, Stack, Text, Title } from "@mantine/core";
+import { SelectionBox } from "@/components/SelectionBox";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { MdCloudDone, MdCloudUpload } from "react-icons/md";
 
-import "@mantine/dropzone/styles.css";
-import { IconContext } from "react-icons";
-
-const BOOKMARKLET_LOCATION = "/getCourses.js";
+// I fetched these values with this command:
+// $ curl -s https://colleague-ss.uoguelph.ca/Student/Courses/GetCatalogAdvancedSearch | jq -c '[.Subjects[].Code]'
+// TODO dynamically fetch this on the server side every couple days/months
+const subjects = ["ACCT","AGR","DAGR","ANSC","ANTH","ARAB","ARTH","AVC","ASCI","AHSS","BIOC","BINF","BIOL","BIOM","BIOP","BIOT","BLCK","BOT","BUS","BADM","CDE","CHEM","CHIN","CLAS","CLIN","CSS","CIS","CONS","COOP","CREA","CRWR","CJPP","CCJP","IMPR","CROP","CTS","DATA","ECS","ECON","ENGG","ENGL","EDRD","ENVM","DENM","ENVS","EQN","DEQN","EURO","FCSS","FRHD","FRAN","FIN","FINA","FSQA","FOOD","FARE","FREN","GEOG","GERM","GREK","HISP","HIST","HORT","DHRT","HTM","HHNS","HK","HROB","HUMN","IES","INDG","IBIO","IAEF","IPS","ISS","UNIV","IDEV","ITAL","JLS","JUST","KIN","LARC","LAT","LACS","LEAD","LING","LTS","MGMT","MCS","MATH","MDST","MICR","MCB","MBG","MUSC","NANO","NEUR","NUTR","ONEH","OAGR","PABI","PATH","CPHH","PHIL","PHYS","PLNT","PBIO","POLS","POPM","PORT","PSYC","REAL","ROY","RPD","RST","SCMA","XSEN","SXGN","SOPR","SOC","SOAN","SPAN","SPMT","STAT","SART","THST","TRMH","TOX","DTM","VETM","CVOA","DVT","WMST","ZOO"];
 
 function ImportPage() {
+  // const navigate = useNavigate();
+  // fetch("upload/courses", { method: "post", body: fd }).then(() => navigate("/account"));
+
   const navigate = useNavigate();
-  const [bookmarklet, setBookmarklet] = useState<string>("");
-  const loading = bookmarklet === "";
-
-  useEffect(() => {
-    fetch(BOOKMARKLET_LOCATION).then((res) => {
-      res.text().then((js) => {
-        // Double scoped to keep the window object clean
-        setBookmarklet(`javascript:(()=>{ { ${encodeURIComponent(js)} } })()`);
-      });
-    });
-  }, []);
-
-  const onDrop = (files: FileWithPath[]) => {
-    files[0].text().then((text) => {
-      const jsonData = JSON.parse(text);
-
-      const fd = new FormData();
-      for (const key in jsonData) {
-        fd.append(key, jsonData[key]);
-      }
-      fetch("/upload/courses", { method: "post", body: fd });
-    });
-
-    const data = files[0];
-    const fd = new FormData();
-    fd.append("courses", data);
-
-    fetch("upload/courses", { method: "post", body: fd }).then(() => navigate("/account"));
-  };
+  const [order, setOrder] = useState<
+    { sub?: string; code?: string; sect?: string }[]
+  >([]);
 
   return (
     <MainLayout>
       <div className="px-8 py-12 sm:px-16">
-        <Title order={1}>Import your courses</Title>
+        <Title>Import your courses</Title>
 
-        <Text>
-          Entering your courses into a calendar manually is a thing of the past.
-          Now you can use a{" "}
-          <Link
-            to="https://en.wikipedia.org/wiki/Bookmarklet"
-            target="_blank"
-            className="underline"
-          >
-            {"bookmarklet"}
-          </Link>{" "}
-          to quickly export your courses into a json file. We'll take that json
-          file and import it on to your account and automatically manage your
-          course schedule.
-        </Text>
+        {/* TODO a list of inputted data */}
 
-        <ImportSection title="Note:">
-          <Text>
-            The bookmarklet provided doesn't access your account credentials,
-            storage, or the internet. It simply scrapes the page for your course
-            info.
-          </Text>
-          <Text>
-            If your schedule changes at any time (for example you drop/add a
-            course) you need to update your courses manually by rerunning the
-            bookmarklet and reuploading the json data.
-          </Text>
-        </ImportSection>
-
-        <Text className="mb-2">
-          Drag this bookmarklet to your bookmarks bar.
-        </Text>
-        <Space h="1rem" />
-
-        <Button
-          loading={loading}
-          loaderProps={{ type: "dots" }}
-          component={loading ? "div" : "a"}
-          href={bookmarklet}
-          variant="filled"
-          className="text-inherit hover:text-inherit"
-        >
-          Course Exporter
-        </Button>
-        <Button variant="subtle" onClick={() => navigate(BOOKMARKLET_LOCATION)}>
-          View bookmarklet source
-        </Button>
-
-        <Text>
-          Once you have the bookmarklet installed you can use it to generate
-          your json data in an easy 3 step process.
-        </Text>
-        <Space h="0.5rem" />
-        <List listStyleType="numeric" withPadding>
-          <List.Item>
-            Go to the{" "}
-            <Link
-              to="https://colleague-ss.uoguelph.ca/Student/Planning/DegreePlans"
-              target="_blank"
-              className="underline"
-            >
-              plan and schedule page
-            </Link>{" "}
-            on WebAdvisor and navigate to your target semester.
-          </List.Item>
-          <List.Item>
-            Launch the bookmarklet and save the file it generates.
-          </List.Item>
-          <List.Item>Import the file below</List.Item>
-        </List>
-
-        <Space my="md" />
-
-        <Dropzone
-          onDrop={onDrop}
-          onReject={() => {}}
-          maxSize={1024 * 5} // 5 KiB file limit
-          maxFiles={1}
-          accept={["application/json"]}
-        >
-          <Group
-            justify="center"
-            gap="xl"
-            mih={220}
-            style={{ pointerEvents: "none" }}
-          >
-            <Dropzone.Accept>
-              <IconContext.Provider
-                value={{
-                  size: rem(52),
-                  color: "var(--mantine-color-dimmed)",
-                }}
-              >
-                <MdCloudDone />
-              </IconContext.Provider>
-            </Dropzone.Accept>
-            <Dropzone.Reject>
-              <IconContext.Provider
-                value={{
-                  size: rem(52),
-                  color: "var(--mantine-color-dimmed)",
-                }}
-              >
-                <MdCloudDone />
-              </IconContext.Provider>
-            </Dropzone.Reject>
-            <Dropzone.Idle>
-              <IconContext.Provider
-                value={{
-                  size: rem(52),
-                  color: "var(--mantine-color-dimmed)",
-                }}
-              >
-                <MdCloudUpload />
-              </IconContext.Provider>
-            </Dropzone.Idle>
-
-            <div>
-              <Text size="xl" inline>
-                Drag file here or click to select file
-              </Text>
-              <Text size="sm" c="dimmed" inline mt={7}>
-                Upload the <Code>courses.json</Code> here. Should not exceed 5
-                KiB
-              </Text>
-            </div>
+        {order.map((e, idx) => (
+          <Group gap={0} key={idx}>
+            <SelectionBox
+              value={e.sub}
+              label="Subject"
+              placeholder="MATH"
+              options={subjects}
+              onSelect={(v) =>
+                setOrder((x) => [...x.slice(0, idx), { sub: v || "" }])
+              }
+              side="left"
+            />
+            <SelectionBox
+              value={e.code}
+              label="Course code"
+              placeholder="1200"
+              onSelect={(v) =>
+                setOrder((x) => [...x.slice(0, idx), { ...x[idx], code: v || "" }])
+              }
+            />
+            <SelectionBox
+              value={e.sect}
+              label="Section"
+              placeholder="0101"
+              onSelect={(v) =>
+                setOrder((x) => [...x.slice(0, idx), { ...x[idx], sect: v || "" }])
+              }
+              side="right"
+            />
           </Group>
-        </Dropzone>
+        ))}
+
+        <Button onClick={() => setOrder((old) => [...old, {}])}>
+          + Add course
+        </Button>
+        <Button
+          onClick={() => {
+            const data = {
+              term: "F25",
+              courses: order.map((v) => ({
+                title: `${v.sub}*${v.code}*${v.sect}`
+              })),
+            };
+            const fd = new FormData();
+            fd.append(
+              "courses",
+              new Blob([JSON.stringify(data)], { type: "application/json" }),
+              "courses.json"
+            );
+            fetch("upload/courses", { method: "post", body: fd }).then(() =>
+              navigate("/account")
+            );
+          }}
+        >
+          Submit
+        </Button>
       </div>
     </MainLayout>
   );
 }
+  // fetch("upload/courses", { method: "post", body: fd }).then(() => navigate("/account"));
 
 export default ImportPage;

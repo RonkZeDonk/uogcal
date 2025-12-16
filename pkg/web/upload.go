@@ -3,7 +3,6 @@ package web
 import (
 	"encoding/json"
 	"io"
-	"strings"
 
 	"github.com/RonkZeDonk/uogcal/pkg/collector"
 	"github.com/RonkZeDonk/uogcal/pkg/database"
@@ -47,9 +46,8 @@ func UploadRoutes(r fiber.Router) {
 		}
 
 		for _, section := range result.Courses {
-			code := strings.Split(section.Title, ":")[0]
-			if !database.CheckCourseExists(code) {
-				course, meetings, err := collector.GetSectionData(result.Term, code, verify.Header, verify.Cookie)
+			if !database.CheckCourseExists(section.Title) {
+				course, meetings, err := collector.GetSectionData(result.Term, section.Title, verify.Header, verify.Cookie)
 				if err != nil {
 					return c.Status(fiber.StatusInternalServerError).SendString(err.Error())
 				}
@@ -60,7 +58,7 @@ func UploadRoutes(r fiber.Router) {
 				}
 			}
 
-			err = database.AddUserToSection(claims.Id, code)
+			err = database.AddUserToSection(claims.Id, section.Title)
 			if err != nil {
 				return c.Status(fiber.StatusInternalServerError).SendString(err.Error())
 			}

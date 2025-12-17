@@ -1,8 +1,9 @@
 import MainLayout from "@/layouts/main";
-import { Button, Group, Stack, Text, Title } from "@mantine/core";
+import { Button, Group, Title } from "@mantine/core";
 import { SelectionBox } from "@/components/SelectionBox";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { FaTrash } from "react-icons/fa";
 
 // I fetched these values with this command:
 // $ curl -s https://colleague-ss.uoguelph.ca/Student/Courses/GetCatalogAdvancedSearch | jq -c '[.Subjects[].Code]'
@@ -10,9 +11,6 @@ import { useNavigate } from "react-router-dom";
 const subjects = ["ACCT","AGR","DAGR","ANSC","ANTH","ARAB","ARTH","AVC","ASCI","AHSS","BIOC","BINF","BIOL","BIOM","BIOP","BIOT","BLCK","BOT","BUS","BADM","CDE","CHEM","CHIN","CLAS","CLIN","CSS","CIS","CONS","COOP","CREA","CRWR","CJPP","CCJP","IMPR","CROP","CTS","DATA","ECS","ECON","ENGG","ENGL","EDRD","ENVM","DENM","ENVS","EQN","DEQN","EURO","FCSS","FRHD","FRAN","FIN","FINA","FSQA","FOOD","FARE","FREN","GEOG","GERM","GREK","HISP","HIST","HORT","DHRT","HTM","HHNS","HK","HROB","HUMN","IES","INDG","IBIO","IAEF","IPS","ISS","UNIV","IDEV","ITAL","JLS","JUST","KIN","LARC","LAT","LACS","LEAD","LING","LTS","MGMT","MCS","MATH","MDST","MICR","MCB","MBG","MUSC","NANO","NEUR","NUTR","ONEH","OAGR","PABI","PATH","CPHH","PHIL","PHYS","PLNT","PBIO","POLS","POPM","PORT","PSYC","REAL","ROY","RPD","RST","SCMA","XSEN","SXGN","SOPR","SOC","SOAN","SPAN","SPMT","STAT","SART","THST","TRMH","TOX","DTM","VETM","CVOA","DVT","WMST","ZOO"];
 
 function ImportPage() {
-  // const navigate = useNavigate();
-  // fetch("upload/courses", { method: "post", body: fd }).then(() => navigate("/account"));
-
   const navigate = useNavigate();
   const [order, setOrder] = useState<
     { sub?: string; code?: string; sect?: string }[]
@@ -23,8 +21,6 @@ function ImportPage() {
       <div className="px-8 py-12 sm:px-16">
         <Title>Import your courses</Title>
 
-        {/* TODO a list of inputted data */}
-
         {order.map((e, idx) => (
           <Group gap={0} key={idx}>
             <SelectionBox
@@ -33,7 +29,11 @@ function ImportPage() {
               placeholder="MATH"
               options={subjects}
               onSelect={(v) =>
-                setOrder((x) => [...x.slice(0, idx), { sub: v || "" }])
+                setOrder((x) => [
+                  ...x.slice(0, idx),
+                  { ...x[idx], sub: v?.toUpperCase() || "" },
+                  ...x.slice(idx + 1),
+                ])
               }
               side="left"
             />
@@ -42,7 +42,11 @@ function ImportPage() {
               label="Course code"
               placeholder="1200"
               onSelect={(v) =>
-                setOrder((x) => [...x.slice(0, idx), { ...x[idx], code: v || "" }])
+                setOrder((x) => [
+                  ...x.slice(0, idx),
+                  { ...x[idx], code: v || "" },
+                  ...x.slice(idx + 1),
+                ])
               }
             />
             <SelectionBox
@@ -50,10 +54,23 @@ function ImportPage() {
               label="Section"
               placeholder="0101"
               onSelect={(v) =>
-                setOrder((x) => [...x.slice(0, idx), { ...x[idx], sect: v || "" }])
+                setOrder((x) => [
+                  ...x.slice(0, idx),
+                  { ...x[idx], sect: v || "" },
+                  ...x.slice(idx + 1),
+                ])
               }
               side="right"
             />
+            <Button
+              mt="auto"
+              color="red"
+              onClick={() =>
+                setOrder((x) => [...x.slice(0, idx), ...x.slice(idx + 1)])
+              }
+            >
+              <FaTrash />
+            </Button>
           </Group>
         ))}
 
@@ -65,7 +82,7 @@ function ImportPage() {
             const data = {
               term: "F25",
               courses: order.map((v) => ({
-                title: `${v.sub}*${v.code}*${v.sect}`
+                title: `${v.sub}*${v.code}*${v.sect}`,
               })),
             };
             const fd = new FormData();
@@ -85,6 +102,5 @@ function ImportPage() {
     </MainLayout>
   );
 }
-  // fetch("upload/courses", { method: "post", body: fd }).then(() => navigate("/account"));
 
 export default ImportPage;
